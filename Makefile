@@ -1,47 +1,50 @@
-# Nome do executável
+# Name of the executable (inside build directory)
 TARGET = build/mygame
 
-# Diretórios
+# Directories
 SRCDIR = src
 INCDIR = include
 BUILDDIR = build
 
-# Arquivos fonte
-SRC = main.cpp $(wildcard $(SRCDIR)/*.cpp)
+# Source files (all .cpp inside src/)
+# There is no main.cpp in the root directory, only in src/
+SRC = $(wildcard $(SRCDIR)/*.cpp)
 
-# Diretório de instalação da Raylib
+# Raylib install path
 RAYLIB_PATH = /usr/local
 
-# Diretório de include da Raylib
+# Raylib include and lib directories
 INCLUDE_DIR = $(RAYLIB_PATH)/include
-
-# Diretório das bibliotecas da Raylib
 LIB_DIR = $(RAYLIB_PATH)/lib
 
-# Flags de compilação
+# Compiler and flags
 CXX = g++
 CXXFLAGS = -Wall -I$(INCDIR) -I$(INCLUDE_DIR)
 LDFLAGS = -L$(LIB_DIR) -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
-# Arquivos objeto
-OBJECTS = $(SRC:%.cpp=$(BUILDDIR)/%.o)
+# Object files (src/foo.cpp -> build/foo.o)
+OBJECTS = $(SRC:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)
 
-# Regra padrão para compilar o executável
+# Default target: build the game
+all: $(TARGET)
+
+# Link the final executable
 $(TARGET): $(OBJECTS)
+	@mkdir -p $(dir $@)        # Ensure build/ exists
 	$(CXX) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
 
-# Regra para compilar os arquivos objeto
-$(BUILDDIR)/%.o: %.cpp
-	@mkdir -p $(dir $@)
+# Compile each .cpp file into .o inside build/
+$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
+	@mkdir -p $(dir $@)        # Create subdirectories in build/ if needed
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Regra para limpar os arquivos gerados
+# Remove generated files
 clean:
 	rm -rf $(BUILDDIR) $(TARGET)
 
-# Regra para rodar o jogo
+# Run the game
 run: $(TARGET)
 	./$(TARGET)
 
-# Phony targets
+# Phony targets (do not correspond to real files)
 .PHONY: all clean run
