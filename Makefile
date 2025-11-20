@@ -46,5 +46,5 @@ clean:
 run: $(TARGET)
 	./$(TARGET)
 
-# Phony targets (do not correspond to real files)
+# Do not correspond to real files
 .PHONY: all clean run
